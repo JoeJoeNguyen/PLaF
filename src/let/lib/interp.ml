@@ -36,6 +36,7 @@ let rec eval_expr : expr -> exp_val ea_result =
     if n2==0
     then error "Division by zero"
     else return (NumVal (n1/n2))
+  (*abs value*)
   | Let(id,def,body) ->
     eval_expr def >>= 
     extend_env id >>+
@@ -62,6 +63,14 @@ let rec eval_expr : expr -> exp_val ea_result =
     eval_expr e >>=
     pair_of_pairVal >>= fun (_,r) ->
     return r
+  | Unpair(id1, id2, e1, e2) ->
+    eval_expr e1 >>=
+    pair_of_pairVal >> fun (l,r) ->
+    (*extend the env*)
+    extend_env id1 l >>+
+    extend_env id2 r >>+
+    eval_expr e2
+    (*unpair (x,y) = pair(1+1,2) in x+y *)
   | Debug(_e) ->
     string_of_env >>= fun str ->
     print_endline str; 
