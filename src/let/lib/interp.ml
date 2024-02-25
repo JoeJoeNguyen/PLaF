@@ -63,20 +63,65 @@ let rec eval_expr : expr -> exp_val ea_result =
     eval_expr e >>=
     pair_of_pairVal >>= fun (_,r) ->
     return r
-  | Unpair(id1, id2, e1, e2) ->
+(*  | Unpair(id1, id2, e1, e2) ->
     eval_expr e1 >>=
-    pair_of_pairVal >> fun (l,r) ->
+    pair_of_pairVal >>+ fun (l,r) ->
     (*extend the env*)
     extend_env id1 l >>+
     extend_env id2 r >>+
     eval_expr e2
     (*unpair (x,y) = pair(1+1,2) in x+y *)
-  | Debug(_e) ->
+*)
+  | IsEmpty ( e ) ->
+    eval_expr e >>= fun ev ->
+    (match ev with
+    | TreeVal Empty -> return (BoolVal true)
+    | TreeVal _ -> return (BoolVal false)
+    | _ -> error "Expression does not evaluate to a binary tree")
+  | EmptyTree ( _t ) -> return (TreeVal Empty)
+  | Node ( e1 , e2 , e3 ) ->
+    eval_expr e1 >>= fun ev1 ->
+    eval_expr e2 >>= fun ev2 ->
+    eval_expr e3 >>= fun ev3 ->
+    (match (ev2,ev3) with
+    | (TreeVal t2, TreeVal t3) -> return (TreeVal (Node(ev1, t2, t3)))
+    | _ -> error "Second and third arguments must be trees")
+  | CaseT ( e1 , e2 , id1 , id2 , id3 , e3 ) ->
+    eval_expr e1 >>= fun ev1 ->
+    (match ev1 with
+    | TreeVal Empty -> eval_expr e2
+    | TreeVal (Node(ev1', t2, t3)) ->
+        extend_env id1 ev1' >>+
+        extend_env id2 (TreeVal t2) >>+
+        extend_env id3 (TreeVal t3) >>+
+        eval_expr e3
+    | _ -> error "Expression does not evaluate to a binary tree")
+
+  | Record(fields) ->
+    let rec eval_fields = function
+      | [] -> return []
+      | (id, (_, e))::rest ->
+        eval_expr e >>= fun v ->
+        eval_fields rest >>= fun fields ->
+        if List.mem_assoc id fields then
+          error ("Record: duplicate fields")
+        else
+          return ((id, v)::fields)
+    in
+    eval_fields fields >>= fun fields ->
+    return (RecordVal fields)
+  | Proj(e, id) ->
+    eval_expr e >>= function
+      | RecordVal fields ->
+        (try return (List.assoc id fields)
+         with Not_found -> error ("Proj : field does not exist "))
+      | _ -> error "Expected a record"
+(*  | Debug(_e) ->
     string_of_env >>= fun str ->
     print_endline str; 
     error "Debug called"
   | _ -> failwith "Not implemented yet!"
-
+*)
 (** [eval_prog e] evaluates program [e] *)
 let eval_prog (AProg(_,e)) =
   eval_expr e

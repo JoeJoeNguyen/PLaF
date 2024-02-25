@@ -1,13 +1,16 @@
 (* This file defines expressed values and environments *)
 
 (* expressed values and environments are defined mutually recursively *)
-
+type 'a tree = Empty | Node of 'a * 'a tree * 'a tree
 
 type exp_val =
   | NumVal of int
   | BoolVal of bool
   | PairVal of exp_val*exp_val
   | TupleVal of exp_val list
+  | ListVal of exp_val list
+  | TreeVal of exp_val tree
+  | RecordVal of (string * exp_val) list  (* Record value *)
 type env =
   | EmptyEnv
   | ExtendEnv of string*exp_val*env
@@ -113,7 +116,6 @@ let rec string_of_expval = function
   | PairVal (ev1,ev2) -> "PairVal("^string_of_expval ev1
                          ^","^ string_of_expval ev2^")"
   | TupleVal evs -> "TupleVal("^String.concat "," (List.map string_of_expval evs)^")"
-
 let rec string_of_env' ac = function
   | EmptyEnv ->  "["^String.concat ",\n" ac^"]"
   | ExtendEnv(id,v,env) -> string_of_env' ((id^":="^string_of_expval v)::ac) env
