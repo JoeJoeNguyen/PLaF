@@ -1,7 +1,22 @@
+(*
+Son [Joe] Nguyen
+Harris Hamid
+I pledge my Honor that I have abided by the Stevens Honor System
+*)
+
+
 (* This file defines expressed values and environments *)
 
 (* expressed values and environments are defined mutually recursively *)
 type 'a tree = Empty | Node of 'a * 'a tree * 'a tree
+
+(*
+Empty is a variant that represents an empty tree
+
+Node of 'a * 'a tree is another variant that represents a tree node.
+The node contains a value of type 'a and two children which are also of type 'a tree.
+This means that each noe in the tree has a and two subtree
+*)
 
 type exp_val =
   | NumVal of int
@@ -10,7 +25,20 @@ type exp_val =
   | TupleVal of exp_val list
   | ListVal of exp_val list
   | TreeVal of exp_val tree
+  (*
+  This represent a tree value. Each node can contain an exp_val.
+  the exp_va can be any type defined in the exp_val definition
+  *)
+
+
   | RecordVal of (string * exp_val) list  (* Record value *)
+  (*
+  This represents a record value.
+  The record is represented as a list of pairs, where each pair consists of a string
+  and exp_val.
+  This create a record-like structure where each field has a name and a value
+  *)
+
 type env =
   | EmptyEnv
   | ExtendEnv of string*exp_val*env
