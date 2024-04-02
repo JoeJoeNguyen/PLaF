@@ -10,13 +10,9 @@ type exp_val =
   | ProcVal of string*expr*env
   | PairVal of exp_val*exp_val
   | TupleVal of exp_val list
-  | RecordVal of (string*exp_val) list
+  | RecordVal of (string*(bool*exp val)) list
   | UnitVal
   | RefVal of int
-  | Record of (string*(bool*expr)) list
-  | Proj of expr*string
-  | SetField of expr*string*expr
-  | IsNumber of expr
 and
   env =
   | EmptyEnv
