@@ -99,6 +99,12 @@ let rec eval_expr : expr -> exp_val ea_result = fun e ->
     error "Reached breakpoint")
   | _ -> failwith ("Not implemented: "^string_of_expr e)
 
+  | IsNumber(e) ->
+    eval_expr e >>= fun ev ->
+    match ev with
+    | NumVal _ -> return (BoolVal true)
+    | _ -> return (BoolVal false)
+
 let eval_prog (AProg(_,e)) =
   eval_expr e         
 
