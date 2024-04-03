@@ -4,6 +4,12 @@ open Parser_plaf.Parser
     
 let g_store = Store.empty_store 20 (NumVal 0)
 
+let rec addIds fs evs =
+    match fs,evs with
+    | [],[] -> []
+    | (id,(is_mutable,_))::t1, v::t2 -> (id,(is_mutable,v)):: addIds t1 t2
+    | _,_ -> failwith "error: lists have different sizes"
+
 let rec eval_expr : expr -> exp_val ea_result = fun e ->
   match e with
   | Int(n) -> return @@ NumVal n
@@ -124,9 +130,30 @@ let rec eval_expr : expr -> exp_val ea_result = fun e ->
     return (RecordVal (addIds fs evs))
 
   | Proj(e,id) ->
-    failwith "implement"
-  | SetField(e1,id,e2) ->
-    failwith "implement"
+    (eval_expr e >>= function
+        | RecordVal fields ->
+            (*check if the value is immutalbe or not*)
+            (*if it is mutable then we have to dereference then return it*)
+            let field = List.assoc id fields in
+                if fst field then
+                int_of_refVal(snd field) >>= fun n1 ->
+                Store.deref g_store n1
+
+                else return (List.assoc id fields |> snd))
+
+  | SetField(e1,id,e2) -> (*e1 is the record, id is the identifier and e2 is the new value*)
+    (eval_expr e1 >>= function
+        | RecordVal fields ->
+            let field = List.assoc id fields in
+            if fst field then
+                eval_expr e2 >>= fun ev ->
+                int_of_refVal (snd field) >>= fun n1 ->
+                Store.set_ref g_store n1 ev >>= fun _ ->
+                return UnitVal
+            else error "Field not mutable"
+        | _ -> error "Not a record")
+    (*if the field is mutable then we can change it else print out error "Field not mutable"*)
+
   | Debug(_e) ->
     string_of_env >>= fun str_env ->
     let str_store = Store.string_of_store string_of_expval g_store
@@ -140,19 +167,6 @@ process_field (_id,(is_mutable,e)) =
    then return (RefVal (Store.new_ref g_store ev))
    else return ev
 
-let rec addIds ids evs =
-    match ids, evs with
-    | [], [] -> []
-    | id::ids_tail, ev::evs_tail -> (id, ev) :: addIds ids_tail
-    | _, _ -> failwith "Mismatched lengths of ids and evs"
-
-(* Interpret an expression read from a file with optional extension .exr *)
-let interpf (s:string) : exp_val result =
-    let s = String.trim s (* remove leading and trailing spaces *)
-    in let file_name = (* allow rec to be optional *)
-        match String.index_opt s '.' with None -> s^".exr" | _ -> s
-    in interp @@ read_file file_name
-
 let eval_prog (AProg(_,e)) =
   eval_expr e         
 
@@ -161,5 +175,12 @@ let interp (s:string) : exp_val result =
   let c = s |> parse |> eval_prog
   in run c
 
+
+(* Interpret an expression read from a file with optional extension .exr *)
+let interpf (s:string) : exp_val result =
+    let s = String.trim s (* remove leading and trailing spaces *)
+    in let file_name = (* allow rec to be optional *)
+        match String.index_opt s '.' with None -> s^".exr" | _ -> s
+    in interp @@ read_file file_name
 
 
