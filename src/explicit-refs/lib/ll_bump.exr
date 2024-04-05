@@ -1,11 +1,11 @@
 
 (* Example 2 *)
 
-let l1 = { head <= 0; size <= 0}
+let l1 = { head <= 0; length <= 0}
 in let add_front = proc (x) { proc (l) {
    	      begin
 	         l.head <={ data <=x; next <= l.head };
-		 l.size <= l.size+1
+		 l.length <= l.length+1
 end } }
 in letrec bump_helper (nd) =
    if number?(nd)
