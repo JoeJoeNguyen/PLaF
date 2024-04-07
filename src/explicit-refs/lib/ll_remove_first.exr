@@ -9,8 +9,10 @@ in let add_front = proc (x) { proc (l) {
               end
 	      }}
 in let remove_first = proc (l) {
-       l.head <= l.head.next
+       begin
+       l.head <= l.head.next;
        l.length <= l.length - 1
+       end
 }
 in begin
      ((add_front 2) l1);
