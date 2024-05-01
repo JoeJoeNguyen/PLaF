@@ -20,27 +20,27 @@
 #        }
 #  ; instrument_with = []
 #  }
-$ /opt/homebrew/bin/ocamlc.opt -config > /var/folders/dd/c1pbq9yj5qz5db5r7947bbvr0000gn/T/dune_d0c4a1_output
+$ /opt/homebrew/bin/ocamlc.opt -config > /var/folders/dd/c1pbq9yj5qz5db5r7947bbvr0000gn/T/dune_4da793_output
 $ (cd _build/default && /opt/homebrew/bin/ocamlc.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -w -49 -nopervasives -nostdlib -g -bin-annot -I lib/.explicit_refs.objs/byte -no-alias-deps -opaque -o lib/.explicit_refs.objs/byte/explicit_refs.cmo -c -impl lib/explicit_refs.ml-gen)
-$ (cd _build/default && /opt/homebrew/bin/ocamldep.opt -modules -impl lib/store.ml) > _build/default/lib/.explicit_refs.objs/explicit_refs__Store.impl.d
 $ (cd _build/default && /opt/homebrew/bin/ocamldep.opt -modules -intf lib/store.mli) > _build/default/lib/.explicit_refs.objs/explicit_refs__Store.intf.d
+$ (cd _build/default && /opt/homebrew/bin/ocamldep.opt -modules -impl lib/store.ml) > _build/default/lib/.explicit_refs.objs/explicit_refs__Store.impl.d
 $ (cd _build/default && /opt/homebrew/bin/ocamldep.opt -modules -impl lib/ds.ml) > _build/default/lib/.explicit_refs.objs/explicit_refs__Ds.impl.d
 $ (cd _build/default && /opt/homebrew/bin/ocamldep.opt -modules -impl lib/interp.ml) > _build/default/lib/.explicit_refs.objs/explicit_refs__Interp.impl.d
 $ (cd _build/default && /opt/homebrew/bin/ocamlc.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -warn-error -A -g -bin-annot -I lib/.explicit_refs.objs/byte -I /Users/joenguyen/.opam/default/lib/menhirLib -I /Users/joenguyen/.opam/default/lib/parser_plaf -no-alias-deps -opaque -open Explicit_refs -o lib/.explicit_refs.objs/byte/explicit_refs__Ds.cmo -c -impl lib/ds.ml)
 $ (cd _build/default && /opt/homebrew/bin/ocamlc.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -warn-error -A -g -bin-annot -I lib/.explicit_refs.objs/byte -I /Users/joenguyen/.opam/default/lib/menhirLib -I /Users/joenguyen/.opam/default/lib/parser_plaf -no-alias-deps -opaque -open Explicit_refs -o lib/.explicit_refs.objs/byte/explicit_refs__Store.cmi -c -intf lib/store.mli)
 $ (cd _build/default && /opt/homebrew/bin/ocamlc.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -warn-error -A -g -bin-annot -I lib/.explicit_refs.objs/byte -I /Users/joenguyen/.opam/default/lib/menhirLib -I /Users/joenguyen/.opam/default/lib/parser_plaf -intf-suffix .ml -no-alias-deps -opaque -open Explicit_refs -o lib/.explicit_refs.objs/byte/explicit_refs__Store.cmo -c -impl lib/store.ml)
 $ (cd _build/default && /opt/homebrew/bin/ocamlc.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -warn-error -A -g -bin-annot -I lib/.explicit_refs.objs/byte -I /Users/joenguyen/.opam/default/lib/menhirLib -I /Users/joenguyen/.opam/default/lib/parser_plaf -no-alias-deps -opaque -open Explicit_refs -o lib/.explicit_refs.objs/byte/explicit_refs__Interp.cmo -c -impl lib/interp.ml)
-> File "lib/interp.ml", lines 133-142, characters 21-57:
-> 133 | .....................function
-> 134 |         | RecordVal fields ->
-> 135 |             (*check if the value is immutalbe or not*)
-> 136 |             (*if it is mutable then we have to dereference then return it*)
-> 137 |             let field = List.assoc id fields in
-> 138 |                 if fst field then
-> 139 |                 int_of_refVal(snd field) >>= fun n1 ->
-> 140 |                 Store.deref g_store n1
-> 141 | 
-> 142 |                 else return (List.assoc id fields |> snd).
+> File "lib/interp.ml", lines 137-146, characters 21-57:
+> 137 | .....................function
+> 138 |         | RecordVal fields ->
+> 139 |             (*check if the value is immutalbe or not*)
+> 140 |             (*if it is mutable then we have to dereference then return it*)
+> 141 |             let field = List.assoc id fields in
+> 142 |                 if fst field then
+> 143 |                 int_of_refVal(snd field) >>= fun n1 ->
+> 144 |                 Store.deref g_store n1
+> 145 | 
+> 146 |                 else return (List.assoc id fields |> snd).
 > Warning 8 [partial-match]: this pattern-matching is not exhaustive.
 > Here is an example of a case that is not matched:
 > (UnitVal|NumVal _|BoolVal _|ProcVal (_, _, _)|PairVal (_, _)|TupleVal _|
