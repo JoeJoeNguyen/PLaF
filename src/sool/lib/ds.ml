@@ -21,6 +21,7 @@ type exp_val =
   | UnitVal
   | RefVal of int
   | ObjectVal of string*env
+  | Instanceof of expr * expr
 and
   env =
   | EmptyEnv

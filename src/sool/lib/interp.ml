@@ -18,6 +18,13 @@ let g_store = Store.empty_store 20 (NumVal 0)
 (* Global holding class declarations *)
 let g_class_env : class_env ref = ref []
 
+(* Helper function to check if a class is a subclass of another *)
+let rec is_subclass_of c1 c2 =
+  if c1 = c2 then true
+  else
+    match List.assoc_opt c1 !g_class_env with
+    | None -> error ("is_subclass: class " ^ c1 ^ " not found")
+    | Some (super, _, _) -> is_subclass_of super c2
 
 
 (* Initialize contents of g_class_env variable  *)
@@ -266,7 +273,14 @@ and
   | IsEmpty(e) ->
     eval_expr e >>=
     list_of_listVal >>= fun l ->
-    return @@ BoolVal (l=[])   
+    return @@ BoolVal (l=[])
+
+  | IsInstanceOf(e1, id) ->
+    eval_expr e1 >>= fun v1 ->
+    (match v1 with
+    | ObjectVal(c_name1, _)-> return (BoolVal(is_subclass_of c_name1 id))
+    | _ -> error "Expected an object!")
+
   (* Debug *)
   | Debug(_e) ->
     string_of_env >>= fun str_env ->
